@@ -20,11 +20,15 @@
 module Selenium
   module WebDriver
     module PhantomJS
+
       #
+      # Driver implementation for PhantomJS.
       # @api private
       #
 
-      class Bridge < Remote::Bridge
+      class Driver < WebDriver::Driver
+        include DriverExtensions::TakesScreenshot
+
         def initialize(opts = {})
           opts[:desired_capabilities] ||= Remote::Capabilities.phantomjs
 
@@ -47,19 +51,12 @@ module Selenium
             opts[:url] = @service.uri
           end
 
-          super(opts)
+          @bridge = Remote::Bridge.handshake(opts)
+          super(@bridge, listener: opts[:listener])
         end
 
         def browser
           :phantomjs
-        end
-
-        def driver_extensions
-          [DriverExtensions::TakesScreenshot]
-        end
-
-        def capabilities
-          @capabilities ||= Remote::Capabilities.phantomjs
         end
 
         def quit
@@ -67,6 +64,7 @@ module Selenium
         ensure
           @service.stop if @service
         end
+
       end # Bridge
     end # PhantomJS
   end # WebDriver

@@ -17,19 +17,27 @@
 # specific language governing permissions and limitations
 # under the License.
 
-require 'uri'
+module Selenium
+  module WebDriver
+    module Remote
 
-require 'selenium/webdriver/remote/bridge'
-require 'selenium/webdriver/remote/driver'
-require 'selenium/webdriver/remote/response'
-require 'selenium/webdriver/remote/server_error'
-require 'selenium/webdriver/remote/http/common'
-require 'selenium/webdriver/remote/http/default'
+      #
+      # Driver implementation for remote server.
+      # @api private
+      #
 
-require 'selenium/webdriver/remote/capabilities'
-require 'selenium/webdriver/remote/oss/bridge'
-require 'selenium/webdriver/remote/oss/commands'
+      module Driver
 
-require 'selenium/webdriver/remote/w3c/bridge'
-require 'selenium/webdriver/remote/w3c/capabilities'
-require 'selenium/webdriver/remote/w3c/commands'
+        def self.new(**opts)
+          bridge = Remote::Bridge.handshake(opts)
+          if bridge.dialect == :w3c
+            Remote::W3C::Driver.new(bridge, listener: listener)
+          else
+            Remote::OSS::Driver.new(bridge, listener: listener)
+          end
+        end
+
+      end # Driver
+    end # Remote
+  end # WebDriver
+end # Selenium

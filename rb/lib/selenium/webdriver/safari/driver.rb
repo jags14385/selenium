@@ -20,8 +20,24 @@
 module Selenium
   module WebDriver
     module Safari
+
+      #
+      # Driver implementation for Safari.
       # @api private
-      class Bridge < Remote::Bridge
+      #
+
+      class Driver < WebDriver::Driver
+        # TODO (alex): should it really have all these extensions?
+        include DriverExtensions::HasLocation
+        include DriverExtensions::HasNetworkConnection
+        include DriverExtensions::HasRemoteStatus
+        include DriverExtensions::HasSessionId
+        include DriverExtensions::HasTouchScreen
+        include DriverExtensions::HasWebStorage
+        include DriverExtensions::Rotatable
+        include DriverExtensions::TakesScreenshot
+        include DriverExtensions::UploadsFiles
+
         def initialize(opts = {})
           opts[:desired_capabilities] ||= Remote::Capabilities.safari
 
@@ -42,7 +58,8 @@ module Selenium
             opts[:url] = @service.uri
           end
 
-          super(opts)
+          @bridge = Remote::Bridge.handshake(opts)
+          super(@bridge, listener: opts[:listener])
         end
 
         def quit
@@ -50,7 +67,8 @@ module Selenium
         ensure
           @service.stop if @service
         end
-      end # Bridge
+
+      end # Driver
     end # Safari
   end # WebDriver
 end # Selenium

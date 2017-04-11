@@ -17,19 +17,34 @@
 # specific language governing permissions and limitations
 # under the License.
 
-require 'uri'
+module Selenium
+  module WebDriver
+    module Firefox
+      module Driver
+        class << self
 
-require 'selenium/webdriver/remote/bridge'
-require 'selenium/webdriver/remote/driver'
-require 'selenium/webdriver/remote/response'
-require 'selenium/webdriver/remote/server_error'
-require 'selenium/webdriver/remote/http/common'
-require 'selenium/webdriver/remote/http/default'
+          #
+          # Instantiates correct Firefox driver implementation
+          # @return [Marionette::Driver, Legacy::Driver]
+          #
 
-require 'selenium/webdriver/remote/capabilities'
-require 'selenium/webdriver/remote/oss/bridge'
-require 'selenium/webdriver/remote/oss/commands'
+          def new(**opts)
+            if marionette?(opts)
+              Firefox::Marionette::Driver.new(opts)
+            else
+              Firefox::Legacy::Driver.new(opts)
+            end
+          end
 
-require 'selenium/webdriver/remote/w3c/bridge'
-require 'selenium/webdriver/remote/w3c/capabilities'
-require 'selenium/webdriver/remote/w3c/commands'
+          private
+
+          def marionette?(opts)
+            opts.delete(:marionette) != false &&
+              (!opts[:desired_capabilities] || opts[:desired_capabilities].delete(:marionette) != false)
+          end
+        end
+
+      end # Driver
+    end # Firefox
+  end # WebDriver
+end # Selenium

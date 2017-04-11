@@ -20,7 +20,7 @@
 require 'net/http'
 
 require 'selenium/webdriver/phantomjs/service'
-require 'selenium/webdriver/phantomjs/bridge'
+require 'selenium/webdriver/phantomjs/driver'
 
 module Selenium
   module WebDriver
